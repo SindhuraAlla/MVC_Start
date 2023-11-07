@@ -44,7 +44,30 @@
       <div class="row my-2 chart-container card bg-dark m-1 mb-5">
         <canvas id="category-count-chart"></canvas>
       </div>
-      
+      <div class="row my-2">
+        <div class="col-md-6"></div>
+        <div class="col-md-1 col-sm-12 category-filter-text">Product</div>
+        <div class="col-md-1 col-sm-12">
+          <div class="dropdown">
+            <button
+              class="btn btn-warning dropdown-toggle w-100 text-truncate"
+              type="button"
+              id="categoryDropdownMenuSelected"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              data-categoryDropdownMenuSelected="Credit card or prepaid card•Gift card"
+            >
+              Debt settlement
+            </button>
+            <div
+              class="dropdown-menu"
+              aria-labelledby="categoryDropdownMenuSource"
+              id="categoryDropdownMenuSource"
+            ></div>
+          </div>
+        </div>
+      </div>
 
       <table class="table table-dark table-striped">
         <thead>
