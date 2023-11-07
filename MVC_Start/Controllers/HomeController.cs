@@ -4,77 +4,152 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MVC_Start.Models;
+using Microsoft.EntityFrameworkCore;
+using MVC_Start.DataAccess;
 
 namespace MVC_Start.Controllers
 {
+
     public class HomeController : Controller
     {
-        public IActionResult Index(int id)
+        public ApplicationDbContext dbContext;
+
+        public HomeController(ApplicationDbContext context)
+        {
+            dbContext = context;
+        }
+
+        public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult IndexWithLayout()
+        public async Task<IActionResult> GetSubProducts()
         {
-            return View();
+            var subProducts = await dbContext.SubProducts.ToListAsync();
+            return Json(subProducts);
         }
 
-        public IActionResult Contact()
+        public async Task<IActionResult> GetComplaintsForSubProduct(string subProductId)
         {
-            TempData["name"] = "ISM 6225";
+            var complaints = await dbContext.Complaints
+                                        .Where(c => c.SubProduct.Id == subProductId)
+                                        .Select(c => new 
+                                        {
+                                            c.ComplaintId,
+                                            c.CompanyResponse,
+                                            c.State,
+                                            c.DateReceived,
+                                            CompanyName = c.Company.Name,
+                                        })
+                                        .ToListAsync();
+            Console.WriteLine(Json(complaints));
+            return Json(complaints);
+        }
 
-            GuestContact contact = new GuestContact();
+        public async Task<IActionResult> Complaints()
+        {
+            var subProducts = await dbContext.SubProducts.ToListAsync();
+            return View(subProducts);
+        }
 
-            contact.Name = "Manish Agrawal";
-            contact.Email = "magrawal@usf.edu";
-            contact.Phone = "813-974-6716";
-
-
-            /* alternate syntax to initialize object 
-            GuestContact contact2 = new GuestContact
+        public async Task<IActionResult> EditComplaint(string id)
+        {
+            if (id == null)
             {
-              Name = "Manish Agrawal",
-              Email = "magrawal@usf.edu",
-              Phone = "813-974-6716"
-            };
-            */
+                return NotFound();
+            }
 
-            //ViewData["Message"] = "Your contact page.";
-
-            return View(contact);
+            var complaint = await dbContext.Complaints
+                .Include(c => c.Company)
+                .Include(c => c.SubProduct)
+                .FirstOrDefaultAsync(m => m.ComplaintId == id);
+            if (complaint == null)
+            {
+                return NotFound();
+            }
+            return View(complaint);
         }
 
         [HttpPost]
-        public IActionResult Contact(GuestContact contact)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, [Bind("ComplaintId, IssueName, ComplaintWhatHappened, State, ZipCode, CompanyResponse")] Complaint complaint)
         {
-            string name = TempData["name"].ToString();
+            if (id != complaint.ComplaintId)
+            {
+                return NotFound();
+            }
 
-            return View(contact);
+            if (ModelState.IsValid)
+            {
+                var complaintToUpdate = await dbContext.Complaints.FindAsync(id);
+                if (complaintToUpdate == null)
+                {
+                    return NotFound();
+                }
+                complaintToUpdate.IssueName = complaint.IssueName;
+                complaintToUpdate.ComplaintWhatHappened = complaint.ComplaintWhatHappened;
+                complaintToUpdate.State = complaint.State;
+                complaintToUpdate.ZipCode = complaint.ZipCode;
+                complaintToUpdate.CompanyResponse = complaint.CompanyResponse;
+                try
+                {
+                    dbContext.Update(complaintToUpdate);
+                    await dbContext.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                }
+                return RedirectToAction("ComplaintDetails", new { id = complaint.ComplaintId });
+            }
+            return View(complaint);
         }
 
-        /// <summary>
-        /// Replicate the chart example in the JavaScript presentation
-        /// 
-        /// Typically LINQ and SQL return data as collections.
-        /// Hence we start the example by creating collections representing the x-axis labels and the y-axis values
-        /// However, chart.js expects data as a string, not as a collection.
-        ///   Hence we join the elements in the collections into strings in the view model
-        /// </summary>
-        /// <returns>View that will display the chart</returns>
-        public ViewResult DemoChart()
+        [HttpDelete]
+        public async Task<IActionResult> DeleteComplaint(string id)
         {
-            string[] ChartLabels = new string[] { "Africa", "Asia", "Europe", "Latin America", "North America" };
-            int[] ChartData = new int[] { 2478, 5267, 734, 784, 433 };
-
-            ChartModel Model = new ChartModel
+            var complaint = await dbContext.Complaints.FindAsync(id);
+            if (complaint == null)
             {
-                ChartType = "bar",
-                Labels = String.Join(",", ChartLabels.Select(d => "'" + d + "'")),
-                Data = String.Join(",", ChartData.Select(d => d)),
-                Title = "Predicted world population (millions) in 2050"
-            };
+                return Json(new { success = false });
+            }
 
-            return View(Model);
+            dbContext.Complaints.Remove(complaint);
+            await dbContext.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+
+        [HttpGet]
+        [Route("Home/ComplaintDetails")]
+        public async Task<IActionResult> ComplaintDetails(string id)
+        {
+            if (id == null)
+            {
+                return View();
+            }
+
+            var complaint = await dbContext.Complaints
+                .Include(c => c.Company)
+                .Include(c => c.SubProduct)
+                .FirstOrDefaultAsync(m => m.ComplaintId == id);
+
+            if (complaint == null)
+            {
+                return NotFound();
+            }
+
+            return View(complaint);
+        }
+
+        public IActionResult ComplaintSubmit()
+        {
+            return View();
+        }
+
+        public IActionResult About()
+        {
+            return View();
         }
     }
 }
