@@ -42,7 +42,7 @@
                 <div class="col-5 offset-1">
                   <div class="row py-1"><div class="col"> <strong>Company</strong>: @(Model.Company?.Name ?? string.Empty) </div></div>
                   <div class="row py-1"><div class="col"> <strong>Product</strong>: @(Model.SubProduct?.Product?.Name ?? string.Empty) </div></div>
-                  <div class="row py-1"><div class="col"> <strong>Sub Product</strong>: @(Model.SubProduct.Name ?? string.Empty) </div></div>
+                  <div class="row py-1"><div class="col"> <strong>Sub Product</strong>: @(Model.SubProduct?.Name ?? string.Empty) </div></div>
                   <div class="row py-1"><div class="col"> <strong>Submitted Via</strong>: @(Model.SubmittedVia ?? "NA") </div></div>
                   <div class="row py-1"><div class="col"> <strong>Consumer Disputed</strong>: @(Model.ConsumerDisputed ?? "NA") </div></div>
                   <div class="row py-1"><div class="col"> <strong>Consumer Consent</strong>: @(Model.ConsumerConsentProvided ?? "NA") </div></div>
@@ -51,8 +51,8 @@
                   <div class="row py-1"><div class="col"> <strong>Zip Code</strong>: @(Model.ZipCode ?? "NA") </div></div>
                 </div>
                 <div class="col">
-                  <div class="row py-1"><div class="col"> <strong>Date Received</strong>: @(Model.DateReceived.ToString("MM/dd/yyyy") ?? string.Empty) </div></div>
-                  <div class="row py-1"><div class="col"> <strong>Date Sent</strong>: @(Model.DateSentToCompany.ToString("MM/dd/yyyy") ?? string.Empty) </div></div>
+                  <div class="row py-1"><div class="col"> <strong>Date Received</strong>: @(Model.DateReceived != DateTime. MinValue ? Model.DateReceived.ToString("MM/dd/yyyy") : string.Empty) </div></div>
+                  <div class="row py-1"><div class="col"> <strong>Date Sent</strong>: @(Model.DateSentToCompany != DateTime. MinValue ? Model.DateSentToCompany.ToString("MM/dd/yyyy") : string.Empty) </div></div>
                 </div>
               </div>
               <div class="row text-white py-1">

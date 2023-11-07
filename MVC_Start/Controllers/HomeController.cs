@@ -76,10 +76,20 @@ namespace MVC_Start.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("ComplaintId, IssueName, ComplaintWhatHappened, State, ZipCode, CompanyResponse")] Complaint complaint)
         {
-            if (id != complaint.ComplaintId)
+            if (id == null)
             {
-                return NotFound();
-            }
+                Random r = new Random(); 
+                complaint.ComplaintId = r.Next().ToString();
+                try
+                {
+                    dbContext.Add(complaint);
+                    await dbContext.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                }
+                return RedirectToAction("ComplaintDetails", new { id = complaint.ComplaintId });
+            } 
 
             if (ModelState.IsValid)
             {
