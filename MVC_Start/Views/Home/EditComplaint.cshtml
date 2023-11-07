@@ -3,6 +3,9 @@
 }
 
 @model MVC_Start.Models.Complaint
+@{
+    var isEditMode = Model.ComplaintId != null;
+}
 <!DOCTYPE html>
 <html>
   <head>
@@ -31,7 +34,7 @@
     <script type="module"></script>
 
     <div class="container mt-5 text-white">
-      @if (Model != null)
+      @if (isEditMode)
       {
         <div class="col-6">
             <h3>Edit Complaint</h3>
@@ -65,39 +68,35 @@
       else
       {
         <div class="col-6">
-            <h3>Submit New Complaint</h3>
-            <form id="complaint-form">
+            <h3>New Complaint</h3>
+            <form id="complaint-form" class="text-white" asp-action="Edit" method="post">
                 <div class="form-group py-2">
                     <label for="issue", class="fw-bold">Issue:</label>
-                    <input type="text" class="form-control bg-dark text-white" id="issue" required>
+                    <input asp-for="IssueName" type="text" class="form-control bg-dark text-white" id="issue" required>
                 </div>
                 <div class="form-group py-2">
                     <label for="company", class="fw-bold">Company:</label>
-                    <input type="text" class="form-control bg-dark text-white" id="company" required>
-                </div>
-                <div class="form-group py-2">
-                    <label for="product", class="fw-bold">Product:</label>
-                    <input type="text" class="form-control bg-dark text-white" id="product" required>
+                    <input asp-for="Company" type="text" class="form-control bg-dark text-white" id="company" required>
                 </div>
                 <div class="form-group py-2">
                     <label for="sub-product", class="fw-bold">Sub product:</label>
-                    <input type="text" class="form-control bg-dark text-white" id="sub-product" required>
+                    <input asp-for="SubProduct" type="text" class="form-control bg-dark text-white" id="sub-product" required>
                 </div>
                 <div class="form-group py-2">
                     <label for="description", class="fw-bold">Complaint what happened:</label>
-                    <textarea class="form-control bg-dark text-white" id="description" rows="10" required></textarea>
+                    <textarea asp-for="ComplaintWhatHappened" class="form-control bg-dark text-white" id="description" rows="10" required></textarea>
                 </div>
                 <div class="form-group py-2">
                     <label for="state", class="fw-bold">State:</label>
-                    <input type="text" class="form-control bg-dark text-white" id="state" required>
+                    <input asp-for="State" type="text" class="form-control bg-dark text-white" id="state" required>
                 </div>
                 <div class="form-group py-2">
                     <label for="zipcode", class="fw-bold">ZipCode:</label>
-                    <input type="text" class="form-control bg-dark text-white" id="zipcode" required>
+                    <input asp-for="ZipCode" type="text" class="form-control bg-dark text-white" id="zipcode" required>
                 </div>
                   <div class="form-group py-2">
                     <label for="response", class="fw-bold">Company Response:</label>
-                    <input type="text" class="form-control bg-dark text-white" id="response" required>
+                    <input asp-for="CompanyResponse" type="text" class="form-control bg-dark text-white" id="response" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>

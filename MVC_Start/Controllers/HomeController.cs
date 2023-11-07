@@ -53,20 +53,21 @@ namespace MVC_Start.Controllers
             return View(subProducts);
         }
 
-        public async Task<IActionResult> EditComplaint(string id)
+        public async Task<IActionResult> EditComplaint(string? id)
         {
+            Complaint complaint;
             if (id == null)
             {
-                return NotFound();
-            }
-
-            var complaint = await dbContext.Complaints
-                .Include(c => c.Company)
-                .Include(c => c.SubProduct)
-                .FirstOrDefaultAsync(m => m.ComplaintId == id);
-            if (complaint == null)
-            {
-                return NotFound();
+                complaint = new Complaint();
+            } else {
+                complaint = await dbContext.Complaints
+                    .Include(c => c.Company)
+                    .Include(c => c.SubProduct)
+                    .FirstOrDefaultAsync(m => m.ComplaintId == id);
+                if (complaint == null)
+                {
+                    return NotFound();
+                }
             }
             return View(complaint);
         }
@@ -140,11 +141,6 @@ namespace MVC_Start.Controllers
             }
 
             return View(complaint);
-        }
-
-        public IActionResult ComplaintSubmit()
-        {
-            return View();
         }
 
         public IActionResult About()
